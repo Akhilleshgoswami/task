@@ -131,23 +131,17 @@ class DatabaseManager:
     def create_transaction(self, sender_id, receiver_id, amount, details):
      try:
         transaction_id = str(uuid.uuid4())
-        
-        # Fetch sender's and receiver's current balances
+    
         sender_balance = self.get_user_balance(sender_id)
         receiver_balance = self.get_user_balance(receiver_id)
         
         if sender_balance >= amount:
-            # Deduct amount from sender's balance
-            updated_sender_balance = Decimal(sender_balance) - Decimal(amount)
-            # Add amount to receiver's balance
-            updated_receiver_balance = Decimal(receiver_balance) + Decimal(amount)
-
-            # Update sender's balance in the database
-            self.update_user_balance(sender_id, updated_sender_balance)
-            # Update receiver's balance in the database
-            self.update_user_balance(receiver_id, updated_receiver_balance)
             
-            # Insert the transaction record
+            updated_sender_balance = Decimal(sender_balance) - Decimal(amount)
+        
+            updated_receiver_balance = Decimal(receiver_balance) + Decimal(amount)
+            self.update_user_balance(sender_id, updated_sender_balance)
+            self.update_user_balance(receiver_id, updated_receiver_balance)
             sql = "INSERT INTO transactions (transactionId, senderId, receiverId, amount, details) VALUES (%s, %s, %s, %s, %s)"
             val = (transaction_id, sender_id, receiver_id, amount, details)
             self.cursor.execute(sql, val)
@@ -164,7 +158,7 @@ class DatabaseManager:
 
     def get_user_balance(self, user_id):
         try:
-            # Execute a query to fetch the user's balance from the database
+
             sql = "SELECT balance FROM users WHERE id = %s"
             val = (user_id,)
             self.cursor.execute(sql, val)
